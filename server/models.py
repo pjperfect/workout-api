@@ -30,8 +30,8 @@ class Exercise(db.Model):
     category = db.Column(db.String, nullable=False)
     equipment_needed = db.Column(db.Boolean, nullable=False, default=False)
 
-    workout_exercises = db.relationship("WorkoutExercise", back_populates="exercise")
-    workouts = db.relationship("Workout", secondary="workout_exercises", back_populates="exercises")
+    workout_exercises = db.relationship("WorkoutExercise", back_populates="exercise", overlaps="workouts")
+    workouts = db.relationship("Workout", secondary="workout_exercises", back_populates="exercises", overlaps="workout_exercises")
 
     # Model validation — name cannot be empty
     @validates("name")
@@ -64,8 +64,8 @@ class Workout(db.Model):
     duration_minutes = db.Column(db.Integer, nullable=False)
     notes = db.Column(db.Text)
 
-    workout_exercises = db.relationship("WorkoutExercise", back_populates="workout")
-    exercises = db.relationship("Exercise", secondary="workout_exercises", back_populates="workouts")
+    workout_exercises = db.relationship("WorkoutExercise", back_populates="workout", overlaps="exercises,workouts")
+    exercises = db.relationship("Exercise", secondary="workout_exercises", back_populates="workouts", overlaps="workout_exercises")
 
     # Model validation — duration must be a positive integer
     @validates("duration_minutes")
@@ -101,8 +101,8 @@ class WorkoutExercise(db.Model):
     sets = db.Column(db.Integer)
     duration_seconds = db.Column(db.Integer)
 
-    workout = db.relationship("Workout", back_populates="workout_exercises")
-    exercise = db.relationship("Exercise", back_populates="workout_exercises")
+    workout = db.relationship("Workout", back_populates="workout_exercises", overlaps="exercises,workouts")
+    exercise = db.relationship("Exercise", back_populates="workout_exercises", overlaps="exercises,workouts")
 
     # Model validation — reps must be positive if provided
     @validates("reps")
